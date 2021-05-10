@@ -5,6 +5,6 @@ Just save CMakeLists to build cache in the build directory.
 
 ## Scripts
 
-cmake --build ./build
-.\build\src\Basic_run.exe
-.\build\tests\Basic_tst.exe
+- cmake --build ./build
+- .\build\src\Basic_run.exe
+- .\build\tests\Basic_tst.exe
