@@ -8,11 +8,11 @@ TEST(StatToolTests, mandatory) {
         statTool.MesurePositionReady(i, 0.5e6 * i);
         statTool.MesureDensityReady(i, 0.5e6 * i);
     }
-    EXPECT_TRUE(false);
-    int mean;
-    int min;
-    int median;
-    statTool.Elaboration(7, 10, &mean, &min, &median);
-    std::cout << mean << " " << min << " " << median << "\n";
-    EXPECT_TRUE(false);
+    int mean = 0;
+    int min = 0;
+    int median = 0;
+    statTool.Elaboration(6, 9, &mean, &min, &median);
+    EXPECT_EQ(7, mean);
+    EXPECT_EQ(6, min);
+    EXPECT_EQ(7, median);
 };
