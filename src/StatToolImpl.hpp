@@ -13,15 +13,20 @@
 class StatToolImpl {
     public:
     /**
-     * Get an index of a ref even if it's not exactly this.
-     * Return the nearest left or right
-     * vec is ordered
+     * Get an index of the nearest from ref in a vector.
+     * Return If found return the exact index. Otherwise the nearest index left or right.
+     * 
+     * Algo: bisection
      **/
     bool FindIndex(const std::vector<int> &vec, const int ref, const bool left, int &index);
+
     /**
-     * Sum the integers in current vector
+     * Sum the integers in a vector
+     * 
+     * Algo: multithreading programmation. See MAX_THREAD variable
      **/
     int Sum(const std::vector<int>::iterator &begin, const std::vector<int>::iterator &end, int size);
+
     /**
      * Push in the current vector "vec" the pair of values time_us and value and trim vec with the
      * time_trim value

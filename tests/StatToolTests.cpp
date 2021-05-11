@@ -1,6 +1,5 @@
 #include "../src/StatTool.hpp"
 #include <gtest/gtest.h>
-#include <iostream>
 
 TEST(StatToolTests, mandatory) {
     StatTool statTool;

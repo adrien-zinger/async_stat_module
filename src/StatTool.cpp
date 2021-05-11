@@ -5,9 +5,6 @@
 
 #define TRIM 5e6
 
-std::mutex mtx_density;
-std::mutex mtx_position;
-
 StatTool::~StatTool() {
     time_pos.val.clear();
     time_pos.time_us.clear();
@@ -16,15 +13,13 @@ StatTool::~StatTool() {
 }
 
 void StatTool::MesureDensityReady(int density, int time_us) {
-    mtx_density.lock();
+    std::lock_guard<std::mutex> lock(mtx_density);
     impl.Push(TRIM, time_us, density, time_density);
-    mtx_density.unlock();
 }
 
 void StatTool::MesurePositionReady(int position_mm, int time_us) {
-    mtx_position.lock();
+    std::lock_guard<std::mutex> lock(mtx_position);
     impl.Push(TRIM, time_us, position_mm, time_pos);
-    mtx_position.unlock();
 }
 
 void dumpError(std::string msg, int min_pos_mm, int max_pos_mm,

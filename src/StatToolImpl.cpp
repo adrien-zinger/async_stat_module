@@ -2,7 +2,6 @@
 #include <cmath>
 #include <pthread.h>
 #include <memory>
-#include <iostream>
 
 bool StatToolImpl::FindIndex(const std::vector<int> &vec, const int ref, const bool left, int &index) {
     int l = 0;
@@ -44,7 +43,6 @@ void *sum_array(void* arg) {
     int i = 0;
     auto it = data->from;
     for (; it != data->end && i < data->size; data->sum += *it, ++it, ++i);
-    //{std::cout << "Process add: " << *it << "\n";}
     return nullptr;
 }
 
@@ -54,7 +52,6 @@ int StatToolImpl::Sum(const std::vector<int>::iterator &begin,
     auto from = begin;
     if (size <= MAX_THREAD) { // easy return
         for (auto it = begin; it != end;  sum += *it++);
-        //{std::cout << "  Process add: " << *it << "\n";}
         return sum;
     }
     // Else dividing
@@ -62,15 +59,11 @@ int StatToolImpl::Sum(const std::vector<int>::iterator &begin,
     struct thread_data data[MAX_THREAD];
     const auto cutsize = std::floor(size / MAX_THREAD);
     const int remaining = (size % MAX_THREAD) == 0 ? cutsize :  size % MAX_THREAD + 1;
-    //std::cout << "vals: " << *begin  << ", " << size << ", " << cutsize << "\n";
     for (int i = 0; i < MAX_THREAD; ++i, from += cutsize) {
         data[i].from = from;
         data[i].size = (i == MAX_THREAD - 1) ? remaining : cutsize;
         data[i].end = end;
         data[i].sum = 0;
-        //std::cout << "will add: \n";
-        //int a = 0;
-        //for (auto it=from; a < data[i].size; ++a, ++it) std::cout << "  " << *it << "\n";
         pthread_create(&threads[i], nullptr, sum_array, (void*)&data[i]);
     }
     for (int i = 0; i < MAX_THREAD; sum += data[i].sum, ++i)

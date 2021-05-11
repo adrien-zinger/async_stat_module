@@ -62,7 +62,6 @@ TEST(StatToolImplTest, testPush) {
     tool.Push(5e6, 5.3e6, 5, stats);
     EXPECT_EQ(5, stats.val.size());
     tool.Push(5e6, 6.3e6, 6, stats);
-    //for (auto v:stats.val) std::cout << v << " v\n";
     auto sum = tool.Sum(stats.val.begin(), stats.val.end(), stats.val.size());
     EXPECT_EQ(20, sum);
     EXPECT_EQ(5, stats.val.size());

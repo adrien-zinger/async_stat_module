@@ -1,6 +1,6 @@
 #include <iostream>
-#include <hello.hpp>
 
+// Polite function
 int main(int, char**) {
-    std::cout << getHello() << std::endl;
+    std::cout << "Thank you !" << std::endl;
 }
