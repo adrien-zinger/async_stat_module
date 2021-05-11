@@ -34,3 +34,11 @@ TEST(StatToolImplTest, FindInBetween) {
     EXPECT_TRUE(tool.FindIndex(vec, 10, false, index));
     EXPECT_EQ(6, index);
 }
+
+TEST(StatToolImplTest, sum) {
+    StatToolImpl tool;
+    std::vector<int> vec{11,11,11,11,11,11,11,11,11,11};
+    int sum;
+    EXPECT_TRUE(tool.Sum(vec, sum));
+    EXPECT_EQ(110, sum);
+}
