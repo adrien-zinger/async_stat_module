@@ -13,11 +13,11 @@
 class StatToolImpl {
     public:
     /**
-     * Get an index of a time_ref even if it's not exactly this.
+     * Get an index of a ref even if it's not exactly this.
      * Return the nearest left or right
      * vec is ordered
      **/
-    bool FindIndex(const std::vector<int> &vec, const int time_ref, const bool left, int &index);
+    bool FindIndex(const std::vector<int> &vec, const int ref, const bool left, int &index);
     /**
      * Sum the integers in current vector
      **/

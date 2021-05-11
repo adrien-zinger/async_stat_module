@@ -4,26 +4,26 @@
 #include <memory>
 #include <iostream>
 
-bool StatToolImpl::FindIndex(const std::vector<int> &vec, const int time_ref, const bool left, int &index) {
+bool StatToolImpl::FindIndex(const std::vector<int> &vec, const int ref, const bool left, int &index) {
     int l = 0;
     int r = vec.size() - 1;
-    if (vec[l] > time_ref || vec[r] < time_ref || vec[l] >= vec[r])
+    if (vec[l] > ref || vec[r] < ref || vec[l] >= vec[r])
         return false;
-    if (vec[l] == time_ref) {
+    if (vec[l] == ref) {
         index = l;
         return true;
     }
-    if (vec[r] == time_ref) {
+    if (vec[r] == ref) {
         index = r;
         return true;
     }
     while (r - l > 1) {
         const int m = std::floor((l+r) / 2);
-        if (vec[m] == time_ref) {
+        if (vec[m] == ref) {
             index = m;
             return true;
         }
-        if (vec[l] <= time_ref && time_ref < vec[m])
+        if (vec[l] <= ref && ref < vec[m])
             r = m;
         else l = m;
     }
@@ -68,7 +68,7 @@ void StatToolImpl::Push(const int time_trim, const int time_us, const int densit
     total_density += density; // Push the new density
     const auto trim_ref = time_us - time_trim;
     int trim_index;
-    if (FindIndex(vec.time_us, trim_ref, true, trim_index)) {
+    if (total_density != -1 && FindIndex(vec.time_us, trim_ref, true, trim_index)) {
         const auto sliced = std::vector<int>(vec.val.begin(), vec.val.begin() + trim_index);
         vec.val.erase(vec.val.begin() + trim_index);
         vec.time_us.erase(vec.time_us.begin() + trim_index);
