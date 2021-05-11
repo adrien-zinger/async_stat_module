@@ -38,9 +38,7 @@ TEST(StatToolImplTest, FindInBetween) {
 TEST(StatToolImplTest, sum) {
     StatToolImpl tool;
     std::vector<int> vec{1,2,3,4,5,6,7,8,9,10,11,12};
-    int sum;
-    EXPECT_TRUE(tool.Sum(vec, sum));
-    EXPECT_EQ(78, sum);
+    EXPECT_EQ(78, tool.Sum(vec));
 }
 
 TEST(StatToolImplTest, testPush) {
