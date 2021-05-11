@@ -64,6 +64,17 @@ bool StatToolImpl::Sum(const std::vector<int> &vec, int &sum) {
     return true;
 }
 
-bool StatToolImpl::Push(const int time_trim, const int time_us, const int val, StatVector &vec) {
-    return false;
+bool StatToolImpl::Push(const int time_trim, const int time_us, const int density, StatVector &vec, int &total_density) {
+    total_density += density; // Push the new density
+    const auto trim_ref = time_us - time_trim;
+    int trim_index;
+    if (FindIndex(vec.time_us, trim_ref, true, trim_index)) {
+        const auto sliced = std::vector<int>(vec.val.begin(), vec.val.begin() + trim_index);
+        int sum = 0;
+        vec.val.erase(vec.val.begin() + trim_index);
+        vec.time_us.erase(vec.time_us.begin() + trim_index);
+        Sum(sliced, sum);
+        total_density -= sum; // Cut from the total density what has been sliced
+    }
+    return true;
 }

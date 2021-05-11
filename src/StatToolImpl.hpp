@@ -23,9 +23,9 @@ class StatToolImpl {
      **/
     bool Sum(const std::vector<int> &vec, int &sum);
     /**
-     * Push in the current vector "vec" the pair of values time_us and val and trim vec with the
+     * Push in the current vector "vec" the pair of values time_us and density and trim vec with the
      * time_trim value
      **/
-    bool Push(const int time_trim, const int time_us, const int val, StatVector &vec);
+    bool Push(const int time_trim, const int time_us, const int density, StatVector &vec, int &total_density);
 
 };
