@@ -27,6 +27,4 @@ class StatToolImpl {
      * time_trim value
      **/
     void Push(const int time_trim, const int time_us, const int density, StatVector &vec, int &total_density);
-
-    int Median(const std::vector<int> &vec);
 };

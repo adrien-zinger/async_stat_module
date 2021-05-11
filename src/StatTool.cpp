@@ -1,11 +1,15 @@
 #include "StatTool.hpp"
-#include <mutex>
 #include <algorithm>
+#include <math.h>
 
 #define TRIM 5e6
 
-std::mutex mtx_density;
-std::mutex mtx_position;
+StatTool::~StatTool() {
+    time_pos.val.clear();
+    time_pos.time_us.clear();
+    time_density.val.clear();
+    time_density.time_us.clear();
+}
 
 void StatTool::MesureDensityReady(int density, int time_us) {
     std::lock_guard<std::mutex> lock(mtx_density);
@@ -36,14 +40,20 @@ void StatTool::Elaboration(int min_pos_mm, int max_pos_mm,
         && impl.FindIndex(time_pos.time_us, time_max, true, max_index);
     if (!success) return; // should throw an error or signal that's return
     // Get subvector
-    std::vector<int> subvec(time_density.val.begin() + min_index,
-        time_density.val.begin() + max_index);
-    den_lock.unlock();
-
+    const auto begin = time_density.val.begin() + min_index;
+    const auto end = time_density.val.begin() + max_index;
+    const int size = max_index - min_index;
+    // Not sure if I can release here den_lock.unlock();
     // Compute mean
-    //*mean_density = impl.Sum(subvec) / (max_index - min_index);
+    *mean_density = impl.Sum(begin, end, size) / size;
     // Compute min
-    *min_density = *std::min_element(subvec.begin(), subvec.end());
+    *min_density = *std::min_element(begin, end);
     // Compute median
-    // todo
+    // Need a copy or we may loose information
+    std::vector<int> sorted(begin, end);
+    std::sort(sorted.begin(), sorted.end());
+    *median = sorted.size() % 2 != 0 ?
+        std::floor(sorted[sorted.size() / 2])
+        : (sorted[(sorted.size() - 1) / 2] + sorted[sorted.size() / 2]) / 2;
+    den_lock.unlock();
 }

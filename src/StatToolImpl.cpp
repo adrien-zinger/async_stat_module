@@ -69,10 +69,6 @@ int StatToolImpl::Sum(const std::vector<int>::iterator &begin, const std::vector
     return sum;
 }
 
-int StatToolImpl::Median(const std::vector<int> &vec) {
-    return 0;
-}
-
 void StatToolImpl::Push(const int time_trim, const int time_us, const int density, StatVector &vec, int &total_density) {
     total_density += density; // Push the new density
     const auto trim_ref = time_us - time_trim;
