@@ -23,8 +23,8 @@ class StatToolImpl {
      **/
     int Sum(const std::vector<int>::iterator &begin, const std::vector<int>::iterator &end, int size);
     /**
-     * Push in the current vector "vec" the pair of values time_us and density and trim vec with the
+     * Push in the current vector "vec" the pair of values time_us and value and trim vec with the
      * time_trim value
      **/
-    void Push(const int time_trim, const int time_us, const int density, StatVector &vec, int &total_density);
+    void Push(const int time_trim, const int time_us, const int density, StatVector &vec);
 };

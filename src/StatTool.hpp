@@ -18,8 +18,6 @@ class StatTool {
     void Elaboration(int min_pos_mm, int max_pos_mm, int *mean_density, int *min_density, int *median);
 
     private:
-    std::mutex mtx_density;
-    std::mutex mtx_position;
     int total_density = 0;
     StatVector time_pos;
     StatVector time_density;

@@ -1,8 +1,12 @@
 #include "StatTool.hpp"
 #include <algorithm>
 #include <math.h>
+#include <iostream>
 
 #define TRIM 5e6
+
+std::mutex mtx_density;
+std::mutex mtx_position;
 
 StatTool::~StatTool() {
     time_pos.val.clear();
@@ -12,14 +16,15 @@ StatTool::~StatTool() {
 }
 
 void StatTool::MesureDensityReady(int density, int time_us) {
-    std::lock_guard<std::mutex> lock(mtx_density);
-    impl.Push(TRIM, time_us, density, time_density, total_density);
+    mtx_density.lock();
+    impl.Push(TRIM, time_us, density, time_density);
+    mtx_density.unlock();
 }
 
 void StatTool::MesurePositionReady(int position_mm, int time_us) {
-    std::lock_guard<std::mutex> lock(mtx_position);
-    int i = -1;
-    impl.Push(TRIM, time_us, position_mm, time_pos, i);
+    mtx_position.lock();
+    impl.Push(TRIM, time_us, position_mm, time_pos);
+    mtx_position.unlock();
 }
 
 void StatTool::Elaboration(int min_pos_mm, int max_pos_mm,

@@ -39,25 +39,34 @@ TEST(StatToolImplTest, sum) {
     StatToolImpl tool;
     std::vector<int> vec{1,2,3,4,5,6,7,8,9,10,11,12};
     EXPECT_EQ(78, tool.Sum(vec.begin(), vec.end(), vec.size()));
+    EXPECT_EQ(26, tool.Sum(vec.begin() + 4, vec.begin() + 8, 4));
+    EXPECT_EQ(2, tool.Sum(vec.begin() + 1, vec.begin() + 2, 1));
+    EXPECT_EQ(5, tool.Sum(vec.begin() + 1, vec.begin() + 3, 2));
+    EXPECT_EQ(12, tool.Sum(vec.end() - 1, vec.end(), 1));
+    for (int i = 13; i < 101; ++i) vec.push_back(i);
+    EXPECT_EQ(5050, tool.Sum(vec.begin(), vec.end(), vec.size()));
 }
+//*/
 
 TEST(StatToolImplTest, testPush) {
     StatToolImpl tool;
     StatVector stats;
-    int total = 0;
-    tool.Push(5e6, 1.3e6, 1, stats, total);
+    tool.Push(5e6, 1.3e6, 1, stats);
     EXPECT_EQ(1, stats.val.size());
-    tool.Push(5e6, 2.3e6, 2, stats, total);
+    tool.Push(5e6, 2.3e6, 2, stats);
     EXPECT_EQ(2, stats.val.size());
-    tool.Push(5e6, 3.3e6, 3, stats, total);
+    tool.Push(5e6, 3.3e6, 3, stats);
     EXPECT_EQ(3, stats.val.size());
-    tool.Push(5e6, 4.3e6, 4, stats, total);
+    tool.Push(5e6, 4.3e6, 4, stats);
     EXPECT_EQ(4, stats.val.size());
-    tool.Push(5e6, 5.3e6, 5, stats, total);
+    tool.Push(5e6, 5.3e6, 5, stats);
     EXPECT_EQ(5, stats.val.size());
-    tool.Push(5e6, 6.3e6, 6, stats, total);
-    EXPECT_EQ(15, total);
+    tool.Push(5e6, 6.3e6, 6, stats);
+    //for (auto v:stats.val) std::cout << v << " v\n";
+    auto sum = tool.Sum(stats.val.begin(), stats.val.end(), stats.val.size());
+    EXPECT_EQ(20, sum);
     EXPECT_EQ(5, stats.val.size());
     EXPECT_EQ(6, stats.val.back());
     EXPECT_EQ(2, stats.val.front());
 }
+//*/

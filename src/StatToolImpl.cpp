@@ -7,7 +7,7 @@
 bool StatToolImpl::FindIndex(const std::vector<int> &vec, const int ref, const bool left, int &index) {
     int l = 0;
     int r = vec.size() - 1;
-    if (vec[l] > ref || vec[r] < ref || vec[l] >= vec[r])
+    if (ref <= 0 || vec.size() < 1 || vec[l] > ref || vec[r] < ref || vec[l] >= vec[r])
         return false;
     if (vec[l] == ref) {
         index = l;
@@ -43,38 +43,47 @@ void *sum_array(void* arg) {
     data->sum = 0;
     int i = 0;
     auto it = data->from;
-    for (; it != data->end && i < data->size; ++it, ++i)
-        data->sum += *it;
+    for (; it != data->end && i < data->size; data->sum += *it, ++it, ++i);
+    //{std::cout << "Process add: " << *it << "\n";}
     return nullptr;
 }
 
-int StatToolImpl::Sum(const std::vector<int>::iterator &begin, const std::vector<int>::iterator &end, int size) {
+int StatToolImpl::Sum(const std::vector<int>::iterator &begin,
+        const std::vector<int>::iterator &end, int size) {
+    int sum = 0;
+    auto from = begin;
+    if (size <= MAX_THREAD) { // easy return
+        for (auto it = begin; it != end;  sum += *it++);
+        //{std::cout << "  Process add: " << *it << "\n";}
+        return sum;
+    }
+    // Else dividing
     pthread_t threads[MAX_THREAD];
     struct thread_data data[MAX_THREAD];
     const auto cutsize = std::floor(size / MAX_THREAD);
-    int sum = 0;
-    auto from = begin;
-    for (int i = 0; i < MAX_THREAD; ++i) {
+    const int remaining = (size % MAX_THREAD) == 0 ? cutsize :  size % MAX_THREAD + 1;
+    //std::cout << "vals: " << *begin  << ", " << size << ", " << cutsize << "\n";
+    for (int i = 0; i < MAX_THREAD; ++i, from += cutsize) {
         data[i].from = from;
-        data[i].size = cutsize;
+        data[i].size = (i == MAX_THREAD - 1) ? remaining : cutsize;
         data[i].end = end;
         data[i].sum = 0;
-        from += cutsize;
+        //std::cout << "will add: \n";
+        //int a = 0;
+        //for (auto it=from; a < data[i].size; ++a, ++it) std::cout << "  " << *it << "\n";
         pthread_create(&threads[i], nullptr, sum_array, (void*)&data[i]);
     }
-    for (int i = 0; i < MAX_THREAD; ++i) {
+    for (int i = 0; i < MAX_THREAD; sum += data[i].sum, ++i)
         pthread_join(threads[i], nullptr);
-        sum += data[i].sum;
-    }
     return sum;
 }
 
-void StatToolImpl::Push(const int time_trim, const int time_us, const int density, StatVector &vec, int &total_density) {
-    total_density += density; // Push the new density
+void StatToolImpl::Push(const int time_trim, const int time_us, const int value, StatVector &vec) {
     const auto trim_ref = time_us - time_trim;
+    vec.val.push_back(value);
+    vec.time_us.push_back(time_us);
     int trim_index;
-    if (total_density != -1 && FindIndex(vec.time_us, trim_ref, true, trim_index)) {
-        total_density -= Sum(vec.val.begin(), vec.val.begin() + trim_index, trim_index); // Cut from the total density what has been sliced
+    if (FindIndex(vec.time_us, trim_ref, true, trim_index)) {
         vec.val.erase(vec.val.begin() + trim_index);
         vec.time_us.erase(vec.time_us.begin() + trim_index);
     }
