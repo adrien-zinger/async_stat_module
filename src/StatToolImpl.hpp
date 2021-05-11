@@ -2,6 +2,11 @@
 #include "StatVector.hpp"
 
 /**
+ * Max number of threads used by the sum function
+ **/
+#define MAX_THREAD 4
+
+/**
  * Implementation of StatTool sub tools
  **/
 
@@ -22,4 +27,5 @@ class StatToolImpl {
      * time_trim value
      **/
     bool Push(const int time_trim, const int time_us, const int val, StatVector &vec);
+
 };

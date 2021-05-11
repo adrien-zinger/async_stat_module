@@ -1,7 +1,8 @@
 #include "StatToolImpl.hpp"
 #include <cmath>
-
-//#include <iostream>
+#include <pthread.h>
+#include <memory>
+#include <iostream>
 
 bool StatToolImpl::FindIndex(const std::vector<int> &vec, const int time_ref, const bool left, int &index) {
     int l = 0;
@@ -30,8 +31,37 @@ bool StatToolImpl::FindIndex(const std::vector<int> &vec, const int time_ref, co
     return true;
 }
 
+struct thread_data {
+    int sum, from, to;
+    std::shared_ptr<std::vector<int>> vec;
+};
+
+void *sum_array(void* arg) {
+    struct thread_data *data;
+    data = (struct thread_data *) arg;
+    for (int i = data->from; i <= data->to; ++i)
+        data->sum += data->vec->at(i);
+    return nullptr;
+}
+
 bool StatToolImpl::Sum(const std::vector<int> &vec, int &sum) {
-    return false;
+    pthread_t threads[MAX_THREAD];
+    struct thread_data data[MAX_THREAD];
+    auto vec_ptr = std::make_shared<std::vector<int>>(vec);
+    const auto cutsize = std::floor(vec.size() / MAX_THREAD);
+    sum = 0;
+    for (int i = 0; i < MAX_THREAD; ++i) {
+        data[i].from = i * cutsize;
+        data[i].to = i == MAX_THREAD - 1 ? vec.size() - 1 : ((i + 1) * cutsize) - 1;
+        data[i].vec = vec_ptr;
+        data[i].sum = 0;
+        pthread_create(&threads[i], nullptr, sum_array, (void*)&data[i]);
+    }
+    for (int i = 0; i < MAX_THREAD; ++i) {
+        pthread_join(threads[i], nullptr);
+        sum += data[i].sum;
+    }
+    return true;
 }
 
 bool StatToolImpl::Push(const int time_trim, const int time_us, const int val, StatVector &vec) {
