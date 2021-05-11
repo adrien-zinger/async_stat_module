@@ -1,0 +1,1 @@
+.\build\tests\Basic_tst.exe > tests.out
