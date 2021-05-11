@@ -41,7 +41,7 @@ void StatTool::Elaboration(int min_pos_mm, int max_pos_mm,
     den_lock.unlock();
 
     // Compute mean
-    *mean_density = impl.Sum(subvec) / (max_index - min_index);
+    //*mean_density = impl.Sum(subvec) / (max_index - min_index);
     // Compute min
     *min_density = *std::min_element(subvec.begin(), subvec.end());
     // Compute median

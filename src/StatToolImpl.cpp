@@ -32,29 +32,34 @@ bool StatToolImpl::FindIndex(const std::vector<int> &vec, const int ref, const b
 }
 
 struct thread_data {
-    int sum, from, to;
-    std::shared_ptr<std::vector<int>> vec;
+    int sum, size;
+    std::vector<int>::iterator from;
+    std::vector<int>::iterator end;
 };
 
 void *sum_array(void* arg) {
     struct thread_data *data;
     data = (struct thread_data *) arg;
-    for (int i = data->from; i <= data->to; ++i)
-        data->sum += data->vec->at(i);
+    data->sum = 0;
+    int i = 0;
+    auto it = data->from;
+    for (; it != data->end && i < data->size; ++it, ++i)
+        data->sum += *it;
     return nullptr;
 }
 
-int StatToolImpl::Sum(const std::vector<int> &vec) {
+int StatToolImpl::Sum(const std::vector<int>::iterator &begin, const std::vector<int>::iterator &end, int size) {
     pthread_t threads[MAX_THREAD];
     struct thread_data data[MAX_THREAD];
-    auto vec_ptr = std::make_shared<std::vector<int>>(vec);
-    const auto cutsize = std::floor(vec.size() / MAX_THREAD);
+    const auto cutsize = std::floor(size / MAX_THREAD);
     int sum = 0;
+    auto from = begin;
     for (int i = 0; i < MAX_THREAD; ++i) {
-        data[i].from = i * cutsize;
-        data[i].to = i == MAX_THREAD - 1 ? vec.size() - 1 : ((i + 1) * cutsize) - 1;
-        data[i].vec = vec_ptr;
+        data[i].from = from;
+        data[i].size = cutsize;
+        data[i].end = end;
         data[i].sum = 0;
+        from += cutsize;
         pthread_create(&threads[i], nullptr, sum_array, (void*)&data[i]);
     }
     for (int i = 0; i < MAX_THREAD; ++i) {
@@ -64,14 +69,17 @@ int StatToolImpl::Sum(const std::vector<int> &vec) {
     return sum;
 }
 
+int StatToolImpl::Median(const std::vector<int> &vec) {
+    return 0;
+}
+
 void StatToolImpl::Push(const int time_trim, const int time_us, const int density, StatVector &vec, int &total_density) {
     total_density += density; // Push the new density
     const auto trim_ref = time_us - time_trim;
     int trim_index;
     if (total_density != -1 && FindIndex(vec.time_us, trim_ref, true, trim_index)) {
-        const auto sliced = std::vector<int>(vec.val.begin(), vec.val.begin() + trim_index);
+        total_density -= Sum(vec.val.begin(), vec.val.begin() + trim_index, trim_index); // Cut from the total density what has been sliced
         vec.val.erase(vec.val.begin() + trim_index);
         vec.time_us.erase(vec.time_us.begin() + trim_index);
-        total_density -= Sum(sliced); // Cut from the total density what has been sliced
     }
 }
